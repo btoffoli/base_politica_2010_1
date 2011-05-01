@@ -1,0 +1,23 @@
+development:
+  database: db2178
+  adapter: mysql
+  username: root
+  password: enxova81
+  host: localhost
+  port: 3360
+
+production:
+  database: example_production
+  adapter: postgresql
+  username: joe
+  password: secret
+  host: localhost
+  port: 5432
+
+test:
+  database: example_test
+  adapter: postgresql
+  username: joe
+  password: secret
+  host: localhost
+  port: 5432
