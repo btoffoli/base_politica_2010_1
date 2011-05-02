@@ -21,18 +21,22 @@ municipio = nil
 bairro = nil
 cod_local = nil
 nome_local = nil
+secoes = ''
 bln_pos_local = false
 bln_pos_endereco = false
+bln_pos_bairro = true
 
 qtd_endereco = 0
 qtd_local = 0
 qtd_bairro = 0
+qtd_secoes = 0
 
 dados.to_text.each do |linha|
   #CAPTURA OS BAIRROS
   if linha =~ /^([:][\s])?([A-Z|ÁÀÃÂÉÊÍÓÔÕÚÜÇ|\'][\s]*)+/ && bln_pos_endereco
     qtd_bairro += 1
     bln_pos_endereco = false
+    bln_pos_bairro = true
     #puts "#{linha.strip} #{qtd_bairro} ******#{qtd_bairro}*******"
     if (qtd_bairro != qtd_endereco)
       puts 'FALHOU'
@@ -67,6 +71,9 @@ dados.to_text.each do |linha|
       nome_local = linha.split(_delimitador)[1..linha.split(_delimitador).length - 1].join(_delimitador).strip
     end
     bln_pos_local = true
+    bln_pos_bairro = false
+    puts secoes.strip
+    secoes = ''
     qtd_local += 1
     #puts "cod_local=#{cod_local} nome_local=#{nome_local} *****#{qtd_local}*****"
   end
@@ -78,9 +85,11 @@ dados.to_text.each do |linha|
     end
   end
   #CAPTURA AS SEÇÕES
-  #if linha =~ /^(\d{1,3}[*]?[\/]\d{1,3}[\s]+)/
-  if linha =~ /^(\d{1,3}[*]?[\/]\d{1,3})[\s\.]+/
-    puts linha
+  if linha =~ /^([:][\s])?(\d{1,3}[*]?[\/]\d{1,3}[\s]+)/ && bln_pos_bairro
+  #if linha =~ /^([:][\s])?(\d{1,3}[*]?[\/]\d{1,3})[\s\.]+/ #&& bln_pos_bairro
+    #puts linha
+    secoes += linha.gsub /\n/, "\t"
+    qtd_secoes += 1
   end
   if linha =~ /^([:][\s])?(Município:)/
     if municipio != linha.split('-')[1]
@@ -108,7 +117,7 @@ dados.to_text.each do |linha|
     #puts linha
   #TODO Encontrar padrões de regexp p/ o codMun, secoes, codZona, nomeBairro e endLocal
 end
-puts "qtd_endereco = #{qtd_endereco} qtd_bairro=#{qtd_bairro} qtd_local=#{qtd_local}"
+puts "qtd_endereco = #{qtd_endereco} qtd_bairro=#{qtd_bairro} qtd_local=#{qtd_local} qtd_secoes=#{qtd_secoes}"
 #puts lista
 #dados.each do |linha| 
   ##begin
