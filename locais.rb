@@ -4,8 +4,8 @@ require 'bundler/setup'
 require 'active_record'
 #require 'mysql'
 require 'pdf/toolkit'
-#ActiveRecord::Base.establish_connection YAML::load(IO.read 'db/config.yml')[ENV['ENV'] || 'development']
-#Dir['./models/**/*.rb'].each{|m| require m}
+ActiveRecord::Base.establish_connection YAML::load(IO.read 'db/config.yml')[ENV['ENV'] || 'development']
+Dir['./models/**/*.rb'].each{|m| require m}
 
 #dados = File.open('../../criativa/eleicoes2010/primeiro_turno/municipios.txt', 'r:ISO-8859-1')
 dados = PDF::Toolkit.open('../../criativa/eleicoes2010/primeiro_turno/enderecos_secao.pdf')
@@ -18,10 +18,12 @@ lista = []
 mapa = {}
 zona = nil
 municipio = nil
+cod_municipio = nil
 bairro = nil
 cod_local = nil
 nome_local = nil
 secoes = ''
+endereco = nil
 bln_pos_local = false
 bln_pos_endereco = false
 bln_pos_bairro = true
@@ -37,11 +39,14 @@ dados.to_text.each do |linha|
     qtd_bairro += 1
     bln_pos_endereco = false
     bln_pos_bairro = true
+    bairro = linha
     #puts "#{linha.strip} #{qtd_bairro} ******#{qtd_bairro}*******"
     if (qtd_bairro != qtd_endereco)
       puts 'FALHOU'
       break
     end
+
+    Local.create CodZona: zona, CodMun: cod_municipio, CodLocal: cod_local, NomLocal: nome_local, Secoes: secoes , Bairro: bairro, EndLocal: endereco
     #COMO O BAIRRO E A ULTIMA COISA A SER LIDA OS REGISTROS SERÃO GRAVADOS A PARTIR DAQUI
   end
   #CAPTURA ENDEREÇO
@@ -50,6 +55,7 @@ dados.to_text.each do |linha|
     qtd_endereco += 1
     bln_pos_endereco = true
     bln_pos_local = false
+    endereco = linha =~ /^([:][\s])/? linha.split(':')[1] : linha
     #puts "#{linha.strip} ******#{qtd_endereco}*****"
     if (qtd_endereco != qtd_local)
       puts 'FALHOU'
@@ -93,6 +99,7 @@ dados.to_text.each do |linha|
   end
   if linha =~ /^([:][\s])?(Município:)/
     if municipio != linha.split('-')[1]
+      cod_municipio = linha.split('-').first
       municipio = linha.split('-')[1]
       #i += 1
       #puts municipio
