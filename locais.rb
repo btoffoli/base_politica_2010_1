@@ -45,8 +45,9 @@ dados.to_text.each do |linha|
       puts 'FALHOU'
       break
     end
-
+    puts secoes
     Local.create CodZona: zona, CodMun: cod_municipio, CodLocal: cod_local, NomLocal: nome_local, Secoes: secoes , Bairro: bairro, EndLocal: endereco
+    secoes = ''
     #COMO O BAIRRO E A ULTIMA COISA A SER LIDA OS REGISTROS SERÃO GRAVADOS A PARTIR DAQUI
   end
   #CAPTURA ENDEREÇO
@@ -78,8 +79,7 @@ dados.to_text.each do |linha|
     end
     bln_pos_local = true
     bln_pos_bairro = false
-    puts secoes.strip
-    secoes = ''
+    #puts secoes.strip
     qtd_local += 1
     #puts "cod_local=#{cod_local} nome_local=#{nome_local} *****#{qtd_local}*****"
   end
@@ -91,12 +91,21 @@ dados.to_text.each do |linha|
     end
   end
   #CAPTURA AS SEÇÕES
-  if linha =~ /^([:][\s])?(\d{1,3}[*]?[\/]\d{1,3}[\s]+)/ && bln_pos_bairro
+  if linha =~ /(\d{1,3}[*]?[\/]\d{1,3}[\s])+/ && bln_pos_bairro
+  #if linha =~ /^((Seção(ões)\/Aptos[\s])?[:][\s])?(\d{1,3}[*]?[\/]\d{1,3}[\s]+)/ && bln_pos_bairro
   #if linha =~ /^([:][\s])?(\d{1,3}[*]?[\/]\d{1,3})[\s\.]+/ #&& bln_pos_bairro
+    if linha =~ /:/
+      linha = linha.split(':')[1]
+    end
     #puts linha
-    secoes += linha.gsub /\n/, "\t"
+    _linha = linha.split("\s")
+    #puts _linha
+    _secoes = _linha.collect{|a| a.split('/').first}.join("\s")
+    #puts _secoes#.class
+    secoes += " #{_secoes.gsub /\n/, "\t"}"
     qtd_secoes += 1
   end
+  
   if linha =~ /^([:][\s])?(Município:)/
     if municipio != linha.split('-')[1]
       cod_municipio = linha.split('-').first
