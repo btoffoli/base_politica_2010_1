@@ -5,6 +5,7 @@ development:
   password: enxova81
   host: localhost
   port: 3360
+  encoding: Latin1
 
 production:
   database: example_production
