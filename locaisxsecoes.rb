@@ -8,7 +8,7 @@ ActiveRecord::Base.establish_connection YAML::load(IO.read 'db/config.yml')[ENV[
 Dir['./models/**/*.rb'].each{|m| require m}
 
 #dados = File.open('../../criativa/eleicoes2010/primeiro_turno/municipios.txt', 'r:ISO-8859-1')
-dados = PDF::Toolkit.open('../../criativa/eleicoes2010/primeiro_turno/enderecos_secao.pdf', 'r:ISO-8859-1')
+dados = PDF::Toolkit.open('../../criativa/eleicoes2010/primeiro_turno/enderecos_secao.pdf')
 
 #dados.readline
 #dados.readline
@@ -45,8 +45,16 @@ dados.to_text.each do |linha|
       puts 'FALHOU'
       break
     end
-    puts secoes
-    Local.create CodZona: zona, CodMun: cod_municipio, CodLocal: cod_local, NomLocal: nome_local, Secoes: secoes , Bairro: bairro, EndLocal: endereco
+    #puts secoes#.gsub(/\n/, '')
+    _secoes = secoes.split(' ')
+    #puts _secoes
+    _secoes.each do |secao|
+      _secao = secao.split('/').first
+      _qtdEleitores = secao.split('/')[1]
+      
+      puts "secao=#{_secao} qtdEleitores=#{_qtdEleitores}"
+    Localxsecao.create CodZona: zona, CodMun: cod_municipio, CodLocal: cod_local, CodSecao: _secao, QtdEleitores: _qtdEleitores
+    end
     secoes = ''
     #COMO O BAIRRO E A ULTIMA COISA A SER LIDA OS REGISTROS SERÃO GRAVADOS A PARTIR DAQUI
   end
@@ -100,9 +108,9 @@ dados.to_text.each do |linha|
     #puts linha
     _linha = linha.split("\s")
     #puts _linha
-    _secoes = _linha.collect{|a| a.split('/').first}.join("\s")
+    #_secoes = _linha.collect{|a| a.split('/').first}.join("\s")
     #puts _secoes#.class
-    secoes += " #{_secoes.gsub /\n/, "\t"}"
+    secoes += " #{linha.strip.gsub /\n/, ' '}"
     qtd_secoes += 1
   end
   
