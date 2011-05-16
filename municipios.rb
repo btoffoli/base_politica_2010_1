@@ -15,8 +15,8 @@ dados.each do |linha|
 
     puts linha
     v = linha.split(' ')
-    puts "inserindo municipio #{v.second} de cod #{v.first}"
-    Municipio.create CodMun: v.first, NomMun: v.second
+    puts "inserindo municipio #{v[1..v.size].join(' ')} de cod #{v.first}"
+    Municipio.create CodMun: v.first, NomMun: v[1..v.size].join(' ')
   rescue Mysql::Error => e
     puts "#{e.class}: #{e.message}"
   end
