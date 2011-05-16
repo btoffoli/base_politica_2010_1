@@ -53,7 +53,7 @@ dados.to_text.each do |linha|
       _qtdEleitores = secao.split('/')[1]
       
       puts "secao=#{_secao} qtdEleitores=#{_qtdEleitores}"
-    Localxsecao.create CodZona: zona, CodMun: cod_municipio, CodLocal: cod_local, CodSecao: _secao, QtdEleitores: _qtdEleitores
+      Localxsecao.create CodZona: zona, CodMun: cod_municipio, CodLocal: cod_local, CodSecao: _secao, QtdEleitores: _qtdEleitores
     end
     secoes = ''
     #COMO O BAIRRO E A ULTIMA COISA A SER LIDA OS REGISTROS SERÃO GRAVADOS A PARTIR DAQUI
@@ -78,6 +78,7 @@ dados.to_text.each do |linha|
     _delimitador = ' - ' if (!_delimitador && linha.split(' - ').length > 1)
 
     cod_local = linha.split(_delimitador).first
+    cod_local = cod_local.start_with?(':') ? cod_local.split(':').second.strip : cod_local
     #Limpa o nome do local
     #puts linha
     if linha.split(_delimitador).length < 2
@@ -116,7 +117,8 @@ dados.to_text.each do |linha|
   
   if linha =~ /^([:][\s])?(Município:)/
     if municipio != linha.split('-')[1]
-      cod_municipio = linha.split('-').first
+      cod_municipio = linha.split('-').first.split(':').second
+      #cod_municipio = linha.split('-').first
       municipio = linha.split('-')[1]
       #i += 1
       #puts municipio

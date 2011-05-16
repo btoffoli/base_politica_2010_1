@@ -1,3 +1,3 @@
 class Localxsecao < ActiveRecord::Base
-  set_table_name 'localxsecao'
+  set_table_name 'LocalxSecao'
 end

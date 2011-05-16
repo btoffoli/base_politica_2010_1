@@ -45,8 +45,9 @@ dados.to_text.each do |linha|
       puts 'FALHOU'
       break
     end
-    puts secoes
-    Local.create CodZona: zona, CodMun: cod_municipio, CodLocal: cod_local, NomLocal: nome_local, Secoes: secoes , Bairro: bairro, EndLocal: endereco
+    #puts secoes
+    puts "Inserindo Local - #{nome_local}"
+    Local.create CodZona: zona, CodMun: cod_municipio, CodLocal: cod_local, NomLocal: nome_local, Secoes: secoes , Bairro: bairro, Endereco: endereco
     secoes = ''
     #COMO O BAIRRO E A ULTIMA COISA A SER LIDA OS REGISTROS SERÃO GRAVADOS A PARTIR DAQUI
   end
@@ -69,9 +70,12 @@ dados.to_text.each do |linha|
     _delimitador = ' -' if (!_delimitador && linha.split(' -').length > 1)
     _delimitador = ' - ' if (!_delimitador && linha.split(' - ').length > 1)
 
-    cod_local = linha.split(_delimitador).first
-    #Limpa o nome do local
     #puts linha
+    #puts _delimitador
+    cod_local = linha.split(_delimitador).first
+    cod_local = cod_local.start_with?(':') ? cod_local.split(':').second.strip : cod_local
+    #puts cod_local
+    #Limpa o nome do local
     if linha.split(_delimitador).length < 2
       nome_local = linha.split(_delimitador)[1].strip
     else
@@ -103,15 +107,15 @@ dados.to_text.each do |linha|
     _secoes = _linha.collect{|a| a.split('/').first}.join("\s")
     #puts _secoes#.class
     secoes += " #{_secoes.gsub /\n/, "\t"}"
-    qtd_secoes += 1
+    qtd_secoes += secoes.split(' ').size
   end
   
   if linha =~ /^([:][\s])?(Município:)/
     if municipio != linha.split('-')[1]
-      cod_municipio = linha.split('-').first
-      municipio = linha.split('-')[1]
+      cod_municipio = linha.split('-').first.split(':').second
+      municipio = linha.split('-').second
       #i += 1
-      #puts municipio
+      #puts "municipio=#{municipio} cod_municipio=#{cod_municipio}"
     end
   end
   #puts linha
